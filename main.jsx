@@ -1,12 +1,9 @@
-
-
 import React from "react";
 import ClaudeRecipe from "./ClaudeRecipe";
 import IngredientsList from "./IngredientsList";
 
 export default function Main() {
   const [ingredients, setIngredients] = React.useState([]);
-
   const [recipe, setRecipe] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
@@ -15,13 +12,16 @@ export default function Main() {
     setRecipe("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/recipe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ingredients }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/recipe`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ingredients }),
+        }
+      );
 
       const data = await response.json();
 
@@ -38,16 +38,16 @@ export default function Main() {
     }
   }
 
-  const ingredientsListItems = ingredients.map((ingredient) => (
-    <li key={ingredient}>{ingredient}</li>
-  ));
-
   function addIngredient(formData) {
     const newIngredient = formData.get("ingredient");
     if (newIngredient) {
-      setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+      setIngredients((prev) => [...prev, newIngredient]);
     }
   }
+
+  const ingredientsListItems = ingredients.map((ingredient, index) => (
+    <li key={index}>{ingredient}</li>
+  ));
 
   return (
     <main>
@@ -61,12 +61,14 @@ export default function Main() {
         <button>Add ingredient</button>
       </form>
 
-      {ingredients.length > 0 && <IngredientsList
-        ingredientsListItems={ingredientsListItems}
-        ingredients={ingredients}
-        handleGetRecipe={handleGetRecipe}
-        loading={loading}
-      />}
+      {ingredients.length > 0 && (
+        <IngredientsList
+          ingredientsListItems={ingredientsListItems}
+          ingredients={ingredients}
+          handleGetRecipe={handleGetRecipe}
+          loading={loading}
+        />
+      )}
 
       {recipe && <ClaudeRecipe recipe={recipe} />}
     </main>
